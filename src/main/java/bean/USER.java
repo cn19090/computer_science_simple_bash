@@ -1,11 +1,11 @@
 package bean;
 
-import ERR.UserListFull;
-import ERR.UserNotFound;
-import ERR.UsernameHasBeenUsed;
+import ERR.*;
 import Go.Main;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,6 +14,7 @@ import java.util.Map;
  * @date 2022/11/9 9:34
  */
 public class USER {
+    public static  Map<Integer, List<FILE>> AFD=new HashMap<>();//当前每个用户打开的文件列表
     private int userFileCount=0;
     private static Map<Integer,USER> userlist=new HashMap<>();
     private int user_id;
@@ -23,6 +24,35 @@ public class USER {
 
     public int getUserFileCount() {
         return userFileCount;
+    }
+
+    public void openFile(FILE file)throws UserOpenFileLimit,UserHasOpenedThisFile{
+        if(AFD.containsKey(this.getUser_id())){
+
+        }else{
+            AFD.put(this.getUser_id(),new LinkedList<FILE>());
+        }
+        List<FILE> files = AFD.get(this.getUser_id());
+        if(files.contains(files)){
+            throw new UserHasOpenedThisFile();
+        }else{
+            if(files.size()>=Main.k){
+                throw new UserOpenFileLimit();
+            }else{
+                files.add(file);
+            }
+        }
+
+    }
+
+    public void closeFile(FILE file){
+        List<FILE> files = AFD.get(this.getUser_id());
+        if(files.contains(file)){
+            files.remove(file);
+        }else{
+            System.out.println("user havent opened this file");
+        }
+
     }
 
     public void setUserFileCount(int userFileCount) {

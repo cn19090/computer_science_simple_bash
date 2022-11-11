@@ -7,7 +7,6 @@ import bean.Node;
 import bean.USER;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -17,7 +16,7 @@ import java.util.Set;
  * @date 2022/11/9 9:30
  */
 public class Main {
-    public static int k,m;
+    public static int s,m,k;
     public static USER now_user=new USER();
 
     public final static FOLDER root=new FOLDER(now_user,"","");
@@ -39,7 +38,8 @@ public class Main {
             "lgout",//8
             "register",//9
             "open",//10
-            "close"//11
+            "close",//11
+            "touch"
     };
 
     public static Scanner scanner=new Scanner(System.in);
@@ -174,7 +174,7 @@ public class Main {
     }
 
     public static void touch(String path)throws UserFileCountLimit{
-        if(now_user.getUserFileCount()>=k){
+        if(now_user.getUserFileCount()>= s){
             throw new UserFileCountLimit();
         }
         FOLDER n;
@@ -250,6 +250,26 @@ public class Main {
 
     }
 
+    public static void open(String path) throws PathNotFound,UserOpenFileLimit,UserHasOpenedThisFile {
+        Node o=getNode(path);
+        if(o instanceof FILE){
+            now_user.openFile((FILE)o);
+        }else{
+            System.out.println("path is not a file");
+        }
+    }
+
+    public static void close(String path)throws PathNotFound{
+        Node o=getNode(path);
+        if(o instanceof FILE){
+            now_user.closeFile((FILE)o);
+        }else{
+            System.out.println("path is not a file");
+
+        }
+
+    }
+
     public static void mainC(){
         while(true){
 
@@ -264,9 +284,23 @@ public class Main {
                         }
                     }
                     switch (cho){
+                        case 3:
+                            Node n=getNode(s[3]);
+                            if(s[2].matches("[\\d]+")){
+                                n.chmod(s[1],Short.parseShort(s[2]));
+                            }else{
+                                if(s[2].charAt(0)=='a'){
+                                    throw new ParamWrong();
+                                }
+                                n.chmod(s[1],s[2]);
+                            }
+
+                            break;
                         case 6:
                             echo(s[3],s[1],(short) (s[2].equals(">>")?0:1));
                             break;
+                        default:
+                            System.out.println("command not found");
                     }
                 }
                 else if(s.length==3){
@@ -283,10 +317,10 @@ public class Main {
                             try {
                                 Node n=getNode(s[2]);
                                 if(s[1].matches("[\\d]+")){
-                                    n.chmod(now_user,Short.parseShort(s[1]));
+                                    n.chmod(now_user.getUsername(),Short.parseShort(s[1]));
                                 }else{
                                     try {
-                                        n.chmod(now_user,s[1]);
+                                        n.chmod(now_user.getUsername(),s[1]);
                                     } catch (ParamWrong e) {
                                         e.printStackTrace();
                                     }
@@ -333,6 +367,15 @@ public class Main {
                         case 9:
                             register(s[1]);
                             break;
+                        case 10:
+                            open(s[1]);
+                            break;
+                        case 11:
+                            close(s[1]);
+                            break;
+                        case 12:
+                            touch(s[1]);
+                            break;
                         default:
                             System.out.println("command not found");
                     }
@@ -354,15 +397,10 @@ public class Main {
                 else{
 
                 }
-            } catch (PathNotFound e) {
-                e.printStackTrace();
-            } catch (UserNotFound e) {
-                e.printStackTrace();
-            } catch (UsernameHasBeenUsed e) {
-                e.printStackTrace();
-            } catch (UserListFull e) {
-                e.printStackTrace();
-            }finally {
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            finally {
                 System.out.println();
                 System.out.print(now_user.getUsername()+"@"+now.getName()+">");
             }
@@ -372,7 +410,9 @@ public class Main {
         System.out.println("input user count limit:");
         m= scanner.nextInt();
         System.out.println("input user file count limit:");
-        k=scanner.nextInt();
+        s =scanner.nextInt();
+        System.out.println("input user open file count limit:");
+        k= scanner.nextInt();
         mainC();
     }
 }

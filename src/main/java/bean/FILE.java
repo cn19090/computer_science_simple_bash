@@ -20,11 +20,13 @@ public class FILE extends Node{
         return null;
     }
     public boolean canBeWrite(USER user){
-        return (permisions.get(user.getUser_id())&0b00100100)>0?true:false;
+        return ((permisions.get(user.getUser_id())+(all_user_permision<<3))&0b00100100)>0?true:false;
     }
+
     public boolean canBeRead(USER user){
-        return (permisions.get(user.getUser_id())&0b00010010)>0?true:false;
+        return ((permisions.get(user.getUser_id())+(all_user_permision<<3))&0b00010010)>0?true:false;
     }
+
     public void write(USER user,byte[] bytes,short contro) {
         if(canBeWrite(user)){
             if(contro==0){
@@ -39,10 +41,11 @@ public class FILE extends Node{
             }else{
                 this.bytes = bytes;
             }
-
+            this.length=this.bytes.length;
         }else{
             
         }
+
 
     }
 
@@ -56,5 +59,7 @@ public class FILE extends Node{
 
     public FILE(USER user,String name,String parentPath){
         super(user,name,parentPath);
+        user.setUserFileCount(user.getUserFileCount()+1);
+
     }
 }
