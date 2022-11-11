@@ -16,7 +16,7 @@ import java.util.Map;
 public class USER {
     public static  Map<Integer, List<FILE>> AFD=new HashMap<>();//当前每个用户打开的文件列表
     private int userFileCount=0;
-    private static Map<Integer,USER> userlist=new HashMap<>();
+    private static Map<Integer,USER> MFD =new HashMap<>();
     private int user_id;
     private String username;
     private FOLDER user_root;
@@ -84,29 +84,29 @@ public class USER {
     }
 
     public static USER getUser(String name)throws UserNotFound{
-        for (Integer integer : userlist.keySet()) {
-            if(userlist.get(integer).getUsername().equals(name)){
-                return userlist.get(integer);
+        for (Integer integer : MFD.keySet()) {
+            if(MFD.get(integer).getUsername().equals(name)){
+                return MFD.get(integer);
             }
         }
         throw new UserNotFound();
     }
 
     public USER(String name)throws UsernameHasBeenUsed, UserListFull {
-        if(userlist.size()>= Main.m){
+        if(MFD.size()>= Main.m){
             throw new UserListFull();
         }
         this.user_id=(int)(Math.random()*1000000);
-        while(userlist.containsKey(user_id)){
+        while(MFD.containsKey(user_id)){
             this.user_id=(int)(Math.random()*1000000);
         }
-        for (Integer integer : userlist.keySet()) {
-            if(userlist.get(integer).getUsername().equals(name)){
+        for (Integer integer : MFD.keySet()) {
+            if(MFD.get(integer).getUsername().equals(name)){
                 throw new UsernameHasBeenUsed();
             }
         }
         this.username=name;
-        userlist.put(this.user_id,this);
+        MFD.put(this.user_id,this);
     }
 
     public FOLDER getUser_root() {
@@ -120,7 +120,7 @@ public class USER {
     public USER(){
         this.user_id=1;
         this.username="root";
-        userlist.put(1,this);
+        MFD.put(1,this);
 
     }
 }
